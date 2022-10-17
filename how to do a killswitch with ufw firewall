@@ -1,0 +1,29 @@
+# Configure UFW
+## with this command you can view common errors in your system (working with sysvinit): less /var/log/syslog
+
+ufw default deny outgoing
+ufw default deny incoming
+
+# Now allow outgoing traffic to your vpn ip address and port 
+ufw allow out to vpn.vpn.vpn.vpn port xxxx proto udp
+
+# Here type the command ifconfig and then check if you are using tun0 or tun1 and then use it in the following command
+ufw allow out on tun1 from any to any
+
+# Here you have to allow that a connection from the vpn address can be allowed to your wifi address (usually wlan0, but you can still check which one you're using)
+# This is needed so the message sent to the vpn (to validate your access) can be sent back from the server. Otherwise you will be sending traffic but blocking all, including your user verification
+ufw allow in on wlan0 from vpn.vpn.vpn.vpn to x.x.x.x
+
+
+# To allow multiple udp ports you can do like this:
+ufw allow fromnumber:tonumber/udp
+
+# If you want to add a new vpn server 
+# First allow the vpn to send traffic to your wlan for the first connection and/or reconnection
+ufw allow in on wlan0 from vpn.vpn.vpn.vpn to x.x.x.x
+
+# Then allow the outgoing traffic to the vpn address and port
+ufw allow out to vpn.vpn.vpn.vpn port xxxx proto udp
+
+# Important: in your network applet make sure you configure your gateway server using the vpn IP that you used on the UFW configuration, do not use names because it won't work
+# If you want to use the vpn name (for example usa-serv-1:1818) you have to edit the hosts file to map that name to the real IP so that your network can resolve it

@@ -53,7 +53,7 @@ done
 
 printf "\n\n---------------------\n\n"
 
-select vpn_ip in "I am alredy connected to the VPN (will automatically pick the IP)" "Enter VPN IP manually"
+select vpn_ip in "I am already connected to the VPN (will automatically pick the IP)" "Enter VPN IP manually"
 do
     if [ "$vpn_ip" == "Enter VPN IP manually" ]
     then
@@ -83,7 +83,7 @@ printf "\n\n---------------------\n\n"
 printf "Enter the interface of the vpn. Usually named tun0 or tun1 for OpenVPN or check the name of the .conf file under /etc/wireguard for Wireguard\n"
 select ioption in "Enter vpn interface manually" "Autoselect (choose this only if you are connected to an OpenVPN)"
 do
-    if [ $ioption == "Exit" ]
+    if [ "$ioption" == "Exit" ]
     then
         printf "Leaving the script..."
         exit 0
@@ -91,7 +91,8 @@ do
     if [ "$ioption" == "Enter vpn interface manually" ]
     then
         echo -n "Enter the VPN interface: "
-        read $vpn_interface
+        read vpn_interface
+        break
     else
         select vpn_interface in $( ip link show | grep -v "$local_interface" | grep -v "lo" | grep -oP '(?<=: ).*(?=:)' )
         do

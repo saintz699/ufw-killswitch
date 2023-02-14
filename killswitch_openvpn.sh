@@ -39,7 +39,7 @@ printf "\n\n---------------------\n\n"
 
 printf "Select the interface you're conneted to. \nEthernet interfaces start with eth or enp\nWifi interfaces start with wlan.\n"
 
-select local_interface in $(ip link show | grep -v "lo" | grep -oP '(?<=: ).*(?=:)')
+select local_interface in $(ip link | grep "state UP" | grep -oP '(?<=: ).*(?=:)')
 do
     if [ $local_interface == "Exit" ]
     then

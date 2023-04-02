@@ -20,7 +20,7 @@ printf "Also, make sure you have the port number your VPN will use (it is on the
 
 printf "\n\n------------------------\n\n"
 
-printf "Select \"Yes\" if you want to set up ufw from scratch (will reset existing rules) or \"No\" to simply allow a new connection"
+printf "Select \"Yes\" if you want to set up ufw from scratch (will reset existing rules) or \"No\" to simply allow a new connection\n"
 
 select first_run in "Yes" "No"
 do

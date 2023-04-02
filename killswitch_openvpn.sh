@@ -37,22 +37,28 @@ done
 
 printf "\n\n---------------------\n\n"
 
-printf "Select the interface you're conneted to. \nEthernet interfaces start with eth or enp\nWifi interfaces start with wlan.\n"
-
-select local_interface in $(ip link | grep "state UP" | grep -oP '(?<=: ).*(?=:)')
-do
-    if [ $local_interface == "Exit" ]
-    then
-        printf "Leaving the script..."
-        exit 0
-    else
-        break
-    fi
-done
-
+count_of_interfaces=$(ip link | grep "state UP" | grep -oP '(?<=: ).*(?=:)' | wc -l)
+if [ $count_of_interfaces == 1 ]
+then
+    local_interface=$(ip link | grep "state UP" | grep -oP '(?<=: ).*(?=:)')
+    printf "Automatically selected ** $local_interface ** interface as the local connection you are using"
+else
+    printf "Select the interface you're conneted to:\n\tEthernet interfaces start with eth or enp\n\tWifi interfaces start with wl.\n"
+    select local_interface in $(ip link | grep "state UP" | grep -oP '(?<=: ).*(?=:)')
+    do
+        if [ $local_interface == "Exit" ]
+        then
+            printf "Leaving the script..."
+            exit 0
+        else
+            printf "You selected ** $local_interface ** interface"
+            break
+        fi
+    done
+fi
 
 printf "\n\n---------------------\n\n"
-
+printf "Now enter the IP of the VPN:\n"
 select vpn_ip in "I am already connected to the VPN (will automatically pick the IP)" "Enter VPN IP manually"
 do
     if [ "$vpn_ip" == "Enter VPN IP manually" ]
@@ -70,6 +76,7 @@ do
         break
     fi
 done
+printf "\nWe'll use the following address for the VPN: ** $vpn_ip **"
 
 printf "\n\n---------------------\n\n"
 
@@ -79,9 +86,9 @@ read vpn_port
 
 printf "\n\n---------------------\n\n"
 
-
-printf "Enter the interface of the vpn. Usually named tun0 or tun1 for OpenVPN or check the name of the .conf file under /etc/wireguard for Wireguard\n"
-select ioption in "Enter vpn interface manually" "Autoselect (choose this only if you are connected to an OpenVPN)"
+autopick_interface=0
+printf "Enter the interface of the vpn.\n\tUsually named * tun0 * or * tun1 * for OpenVPN.\n\tFor Wireguard, check the name of the .conf file under /etc/wireguard\n"
+select ioption in "Enter vpn interface manually" "Select from the list (choose this only if you are connected to an OpenVPN)"
 do
     if [ "$ioption" == "Exit" ]
     then
@@ -101,11 +108,18 @@ do
                 printf "Leaving the script..."
                 exit 0
             else
+                autopick_interface=1
                 break
             fi
         done
     fi
+    if [ $autopick_interface == 1 ]
+    then
+        break
+    fi
 done
+
+printf "The VPN interface is ** $vpn_interface **"
 
 local_ip=$( ip r | grep -e "default.*$local_interface" | cut -d " " -f 3 )
 
@@ -138,7 +152,7 @@ ufw enable
 ufw status numbered
 
 printf "\n\nScript finished.\n\n"
-printf "\nRun systemctl enable ufw.service for systemd distributions. .\n\n"
-printf "\nOr add ufw enable to /etc/rc.local for SysV init distributions.\n\n"
+printf "\nRun systemctl enable ufw.service for systemd distributions. .\n"
+printf "\nOr add ufw enable to /etc/rc.local for SysV init distributions.\n"
 
 printf "\n\n------------------------\n\n"

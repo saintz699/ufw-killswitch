@@ -1,0 +1,1 @@
+chromium --proxy-server=socks5://putIPhere --host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE putIPhere"
